@@ -1,0 +1,97 @@
+const data = require('../../source/test/kdata.js');
+// const {nanoid} = require('nanoid'); 
+//k线数据
+const kdata = async(ctx, next)=>{
+    const {code, type} = ctx.request.body;
+    
+    console.log('request kdata ', code, type);
+    
+    await next();
+
+    ctx.response.type = "application/json";
+    if(code === '00001')ctx.response.body = data.kdata[0][type];
+    if(code === '00002')ctx.response.body = data.kdata[1][type];
+    if(code === '00003')ctx.response.body = data.kdata[2][type];
+};
+
+//股票基本信息
+const info = async(ctx, next)=>{
+    const reqBody = ctx.request.body;
+    console.log('request info', reqBody.code);
+
+    await next();
+
+    ctx.response.type = "application/json";
+    if(reqBody.code === '00001')ctx.response.body = data.info[0];
+    if(reqBody.code === '00002')ctx.response.body = data.info[1];
+    if(reqBody.code === '00003')ctx.response.body = data.info[2];
+};
+
+//模拟摆盘数据
+getHandlecapData = (code, price)=>{
+    let buyArray = [];
+    let saleArray = [];
+    const myDate = new Date();
+    for(let i=0; i<9; i++){
+        //处理价格
+        let float = Math.random();
+        let buyPrice = (float+price).toFixed(2);
+        float = Math.random()-0.5;
+        let salePrice = (float+price).toFixed(2);
+
+        //处理时间
+        let hours = myDate.getHours();
+        if(hours<10) hours = '0'+hours;
+        let mins = myDate.getMinutes();
+        if(mins<10) mins = '0'+mins;
+        let secds = myDate.getSeconds();
+        if(secds<10) secds = '0'+secds;
+        let time = `${hours}:${mins}:${secds}`;
+
+        //处理数量
+        float = (Math.random()+0.01)*100;
+        let buyQuantity = float.toFixed(0);
+        float = (Math.random()+0.01)*100;
+        let saleQuantity = float.toFixed(0);
+
+        //封装对象至数组
+        buyArray.push({
+            time:time,
+            price:buyPrice,
+            quant:buyQuantity,
+            type:'buy',
+        });
+        saleArray.push({
+            time:time,
+            price:salePrice,
+            quant:saleQuantity,
+            type:'sale',
+        });
+    }
+    return {
+        code: code,
+        buyArray:buyArray,
+        saleArray:saleArray
+    }
+}
+//股票摆盘
+const handicap = async(ctx, next)=>{
+    const reqBody = ctx.request.body;
+    // console.log('request handlecap', reqBody.code);
+
+    await next();
+
+    ctx.response.type = "application/json";
+    if(reqBody.code === '00001')
+        ctx.response.body = getHandlecapData('00001', data.info[0].price);
+    if(reqBody.code === '00002')
+        ctx.response.body = getHandlecapData('00002', data.info[1].price);
+    if(reqBody.code === '00003')
+        ctx.response.body = getHandlecapData('00003', data.info[2].price);
+}
+
+module.exports = {
+    kdata:kdata,
+    info:info,
+    handicap:handicap,
+};
