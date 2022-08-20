@@ -7,6 +7,9 @@ const mongoose = require('mongoose');
 const {browserTotalRouter,hashTotalRouter} = require('./config/router.js');
 const {prevAuthCheck} = require('./app/controllers/globalMidware.js');
 
+const FtQuant = require('../futu-quant/futuquant');
+const {testFtConfig} = require('../futu-quant/config');
+
 
 //启动工程服务器
 async function init(port=3000,dbName='test',srcPath='./source/static/build'){
@@ -17,10 +20,28 @@ async function init(port=3000,dbName='test',srcPath='./source/static/build'){
         console.log('db connect success!');
     }catch(err){
         console.log('db connect fail',err);
+        return;
+    }
+
+    //连接FutuOpenD
+    const quant = new FtQuant(testFtConfig);
+    try{
+        await quant.init();
+        console.log('futu connect success!');
+    }
+    catch(err){
+        console.log('futu connet fail',err);
+        return;
     }
 
     //服务实例
     const app = new Koa();
+
+    // 挂载futuquant类实例
+    app.use(async(ctx,next)=>{
+        ctx.quant = quant;
+        await next();
+    });
 
     //顶层中间件 验证用户权限
     app.use(prevAuthCheck);
@@ -48,15 +69,33 @@ async function init(port=3000,dbName='test',srcPath='./source/static/build'){
 //启动测试服务器
 async function testinit(port=7777, dbName='test'){
 
-     //连接数据库
-     try{
+    //连接数据库
+    try{
         await mongoose.connect("mongodb://127.0.0.1:27017/"+dbName);
         console.log('db connect success!');
     }catch(err){
         console.log('db connect fail',err);
     }
+
+    //连接FutuOpenD
+    const quant = new FtQuant(testFtConfig);
+    try{
+        await quant.init();
+        console.log('futu connect success!');
+    }
+    catch(err){
+        console.log('futu connet fail',err);
+        return;
+    }
+
     //服务实例
     const app = new Koa();
+
+    // 挂载futuquant类实例
+    app.use(async(ctx,next)=>{
+        ctx.quant = quant;
+        await next();
+    });
     
     //顶层中间件 验证用户权限
     app.use(prevAuthCheck);
@@ -72,5 +111,5 @@ async function testinit(port=7777, dbName='test'){
     console.log(`已启动测试服务器\n请配合create-react-app使用\n(配置其代理至localhost:${port})`);
 }
 
-init(3000,'test','./source/static/build');
-// testinit(7777, 'test');
+// init(3000,'test','./source/static/build');
+testinit(7777, 'test');

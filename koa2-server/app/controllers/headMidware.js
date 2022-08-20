@@ -1,5 +1,7 @@
 const data = require('../../source/test/kdata.js');
-// const {nanoid} = require('nanoid'); 
+const {getSubTemp} = require('../helpers/futuParam.js');
+const {getKlByTypeAndCode} = require('../helpers/futuHelper.js');
+const {checkStockCode} = require('../helpers/stockHelper');
 
 //股票搜索
 const search = async(ctx, next)=>{
@@ -10,13 +12,13 @@ const search = async(ctx, next)=>{
         code : null,
         msg: '',
     };
-
-    if(reqBody.code === '00001'|| reqBody.code === '00002'|| reqBody.code === '00003'){
-        retObj.state = true;
-        retObj.code = reqBody.code;
+    const stockExist = checkStockCode(reqBody.code);
+    if(stockExist === false){
+        retObj.msg = '没有该股票信息！';
     }
     else{
-        retObj.msg = '没有该股票信息！';
+        retObj.state = true;
+        retObj.code = reqBody.code;
     }
     
     await next();
@@ -24,6 +26,8 @@ const search = async(ctx, next)=>{
     ctx.response.type = "application/json";
     ctx.response.body = retObj;
 };
+
+
 
 //盘后数据下载
 const download = async(ctx,next)=>{
@@ -40,7 +44,21 @@ const download = async(ctx,next)=>{
     if(ctx.authState.state === true){
         retObj.state = true;
         retObj.msg='';
-        retObj.data = data.kdata[0];
+        //先订阅
+        const subTemp = getSubTemp();
+        subTemp.securityList.push({market:1,code:reqBody.code});
+        subTemp.subTypeList=[6,10,11,12,13];
+        subTemp.isSubOrUnSub = true;
+        await ctx.quant.qotSub(subTemp);
+        //再获取数据
+        const klData = {
+            minKl:await getKlByTypeAndCode(1,reqBody.code,ctx.quant),
+            hourKl:await getKlByTypeAndCode(9,reqBody.code,ctx.quant),
+            dayKl:await getKlByTypeAndCode(2,reqBody.code,ctx.quant),
+            weekKl:await getKlByTypeAndCode(3,reqBody.code,ctx.quant),
+            monthKl:await getKlByTypeAndCode(4,reqBody.code,ctx.quant),
+        }
+        retObj.data = {klData:klData};
     }
     else{
         retObj.msg="请登录后下载盘后数据";

@@ -1,4 +1,7 @@
 const data = require('../../source/test/kdata.js');
+const {getSubTemp} = require('../helpers/futuParam');
+const {getBasicByCode} = require('../helpers/futuHelper');
+const {checkStockCode} = require('../helpers/stockHelper');
 // const {nanoid} = require('nanoid'); 
 //k线数据
 const kdata = async(ctx, next)=>{
@@ -18,13 +21,34 @@ const kdata = async(ctx, next)=>{
 const info = async(ctx, next)=>{
     const reqBody = ctx.request.body;
     console.log('request info', reqBody.code);
+    const stockExist = checkStockCode(reqBody.code);
+    let retObj = {};
+    if(stockExist !== false){
+        const subTemp = getSubTemp();
+        subTemp.securityList=[{market: 1,code:reqBody.code}];
+        subTemp.subTypeList = [1];
+        subTemp.isRegOrUnRegPush = true;
+        await ctx.quant.qotSub(subTemp);
+        console.log(reqBody.code, subTemp.securityList);
+        const {price,trend} = await getBasicByCode(subTemp.securityList,ctx.quant);
+        retObj = {
+            code: reqBody.code,
+            name: stockExist.name,
+            en:stockExist.en,
+            price: price.curPrice,
+            trend: trend,
+            low:price.lowPrice,
+            high:price.highPrice,
+            vol:Number(price.volume),
+        }
+    }
+
+    
 
     await next();
-
+    console.log(reqBody.code,retObj.trend);
     ctx.response.type = "application/json";
-    if(reqBody.code === '00001')ctx.response.body = data.info[0];
-    if(reqBody.code === '00002')ctx.response.body = data.info[1];
-    if(reqBody.code === '00003')ctx.response.body = data.info[2];
+    ctx.response.body = retObj;
 };
 
 //模拟摆盘数据
