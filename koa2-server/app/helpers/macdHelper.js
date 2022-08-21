@@ -1,0 +1,127 @@
+//切割数组
+function splitData(rawData){
+    const datas = []; 
+    const times = [];
+    const vols = []; 
+    for (let i = 0; i < rawData.length; ++i) {
+      // splice会修改数组 此处为删除数组第一个元素
+      times.push(rawData[i].splice(0, 1)[0]);
+      // 因为删除了数组第一个元素 所以vol由5递补到4
+      vols.push(rawData[i][4]);
+      //除了时间的其他数据
+      datas.push(rawData[i]);
+    }
+    return {
+      datas:datas,
+      times:times,
+      vols:vols
+    };
+}
+
+//计算macd 少算一个ma
+function calcMA(dayCount,data){
+    let total = 0;
+    for(let i=0; i<dayCount; ++i){
+        total += data[i][1];
+    }
+    const result = [];
+    for (let i = 0; i < data.length; ++i) {
+        if (i < dayCount-1) {
+            //小于dayCount天 不计算ma
+            result.push('-');
+            continue;
+        }
+
+        if(i === dayCount-1){
+            //刚好dayCount天
+            result.push((total / dayCount).toFixed(2));
+            continue;
+        }
+        
+        //大于dayCount天 加当前价格 减最早价格
+        total += data[i][1];
+        total -= data[i-dayCount][1];
+        result.push((total / dayCount).toFixed(2));
+    }
+    return result;
+}
+
+//计算EMA ema12、26初始值为收盘价
+function calcEMA(n,data,field){
+    const a=2/(n+1);
+
+    if(field){
+        //适配dif 计算ema26 ema12
+        const ema=[data[0][field]];  
+        for(let i=1; i<data.length; ++i){
+            ema.push((a*data[i][field]+(1-a)*ema[i-1]).toFixed(3));
+        }
+        return ema;
+    }
+
+    //适配dea 计算ema9
+    const ema=[data[0]];
+    for(let i=1; i<data.length; ++i){
+        ema.push((a*data[i]+(1-a)*ema[i-1]).toFixed(3));
+    }
+    return ema;
+};
+
+//计算DIF
+function calcDIF(data,field){
+    const dif=[];
+    const emaShort=calcEMA(12,data,field);
+    const emaLong=calcEMA(26,data,field);
+    for(let i=0; i<data.length; ++i){
+        dif.push((emaShort[i]-emaLong[i]).toFixed(3));
+    }
+    return dif;
+};
+
+//计算DEA
+function calcDEA(dif){
+    return calcEMA(9,dif);
+};
+
+//计算MACD
+function calcMACD (data,field){
+    const result={};
+    const dif=calcDIF(data,field);
+    const dea=calcDEA(dif);
+    const macd=[];
+    for(let i=0; i<data.length; ++i){
+        macd.push(((dif[i]-dea[i])*2).toFixed(3));
+    }
+    result.dif=dif;
+    result.dea=dea;
+    result.macd=macd;
+    return result;
+};
+
+
+
+function kDataformat(kdata){
+    if(!kdata) return {};
+    const retData = {
+        datas:[],
+        macds:{},
+        mas:{},
+        vols:[],
+        times:[],
+    }
+    const splitedData = splitData(kdata);
+
+    retData.datas    = splitedData.datas;
+    retData.times    = splitedData.times;
+    retData.vols     = splitedData.vols;
+    retData.macds    = calcMACD(splitedData.datas,1);
+    retData.mas.ma30 = calcMA(30,splitedData.datas);
+    retData.mas.ma10 = calcMA(10,splitedData.datas);
+    retData.mas.ma5  = calcMA(5, splitedData.datas);
+
+    return retData;
+}
+
+module.exports = {
+    kDataformat:kDataformat,
+};

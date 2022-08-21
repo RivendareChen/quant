@@ -1,20 +1,42 @@
 const data = require('../../source/test/kdata.js');
 const {getSubTemp} = require('../helpers/futuParam');
-const {getBasicByCode} = require('../helpers/futuHelper');
+const {getBasicByCode,
+       getKlParamByType,
+       getSubParamByType,
+       getKlByTypeAndCode} = require('../helpers/futuHelper');
 const {checkStockCode} = require('../helpers/stockHelper');
+const {kDataformat} = require('../helpers/macdHelper');
 // const {nanoid} = require('nanoid'); 
+
+
 //k线数据
 const kdata = async(ctx, next)=>{
     const {code, type} = ctx.request.body;
     
     console.log('request kdata ', code, type);
+
+    let retObj = {state:false,datas:{}};
+
+    if(checkStockCode(code) !== false){
+        //先订阅
+        const subTemp = getSubTemp();
+        subTemp.securityList = [{market:1,code:code}];
+        subTemp.subTypeList = getSubParamByType('kl');
+        subTemp.isSubOrUnSub = true;
+        await ctx.quant.qotSub(subTemp);
+        //获取k线数据
+        const currKlDatas = await getKlByTypeAndCode(getKlParamByType(type),code,ctx.quant,100);
+        retObj.state = true;
+        // retObj.datas = currKlDatas;
+        retObj.datas = kDataformat(currKlDatas);
+    }else{
+        console.log('非法k线请求');
+    }
     
     await next();
-
+    
     ctx.response.type = "application/json";
-    if(code === '00001')ctx.response.body = data.kdata[0][type];
-    if(code === '00002')ctx.response.body = data.kdata[1][type];
-    if(code === '00003')ctx.response.body = data.kdata[2][type];
+    ctx.response.body = retObj;
 };
 
 //股票基本信息
@@ -27,9 +49,9 @@ const info = async(ctx, next)=>{
         const subTemp = getSubTemp();
         subTemp.securityList=[{market: 1,code:reqBody.code}];
         subTemp.subTypeList = [1];
-        subTemp.isRegOrUnRegPush = true;
+        subTemp.isSubOrUnSub = true;
         await ctx.quant.qotSub(subTemp);
-        console.log(reqBody.code, subTemp.securityList);
+        // console.log(reqBody.code, subTemp.securityList);
         const {price,trend} = await getBasicByCode(subTemp.securityList,ctx.quant);
         retObj = {
             code: reqBody.code,
@@ -102,16 +124,23 @@ getHandlecapData = (code, price)=>{
 const handicap = async(ctx, next)=>{
     const reqBody = ctx.request.body;
     // console.log('request handlecap', reqBody.code);
+    const retObj = {code:'',buyArray:[],saleArray:[]};
 
+    //先订阅
+    const subTemp = getSubTemp();
+    subTemp.securityList=[{market:1,code:reqBody.code}];
+    subTemp.subTypeList = getSubParamByType('handicap');
+    subTemp.isSubOrUnSub = true;
+    await ctx.quant.qotSub(subTemp);
+
+    const res = await ctx.quant.qotGetOrderBook({market:1,code:reqBody.code},9);
+    retObj.code = reqBody.code;
+    retObj.buyArray = res.buyList;
+    retObj.saleArray = res.sellList;
     await next();
 
     ctx.response.type = "application/json";
-    if(reqBody.code === '00001')
-        ctx.response.body = getHandlecapData('00001', data.info[0].price);
-    if(reqBody.code === '00002')
-        ctx.response.body = getHandlecapData('00002', data.info[1].price);
-    if(reqBody.code === '00003')
-        ctx.response.body = getHandlecapData('00003', data.info[2].price);
+    ctx.response.body = retObj;
 }
 
 module.exports = {

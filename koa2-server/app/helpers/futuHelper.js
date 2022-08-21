@@ -1,5 +1,21 @@
 const {getKlTemp,getSubTemp}  = require('./futuParam.js');
 
+function getKlParamByType(type = 'typeDay'){
+    if(type === 'typeDay')return 2;
+    if(type === 'typeMin') return 1;
+    if(type === 'typeHour') return 9;
+    if(type === 'typeWeek') return 3
+    if(type === 'typeMonth') return 4;
+    return 2;
+}
+
+function getSubParamByType(type = 'kl'){
+    if(type === 'kl')return [6,10,11,12,13]; //k线订阅参数（分、时、日、周、月）
+    if(type === 'base')return [1]; //基本报价订阅参数
+    if(type === 'handicap')return [2]; //摆盘订阅参数
+    return [1];
+}
+
 //根据k线类型和股票代码获取k线数组 需要先订阅
 //klType 分k=1 时k=9 日k=2 周k=3 月k=4
 async function getKlByTypeAndCode(klType=1, code='00001', quant=null, reqNum=100) {
@@ -57,4 +73,7 @@ async function getBasicByCode(securityList=getSubTemp().securityList, quant=null
 module.exports = {
     getKlByTypeAndCode:getKlByTypeAndCode,
     getBasicByCode:getBasicByCode,
+    getKlParamByType:getKlParamByType,
+    getSubParamByType:getSubParamByType,
+
 };

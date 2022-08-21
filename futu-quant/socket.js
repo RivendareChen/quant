@@ -209,7 +209,7 @@ class Socket{
             return Number(`0x${sha1.substr(index*2,2)}`)
         });
         
-        if(protoId != 1004) //KeepAlive调用频繁 忽视
+        if(protoId != 1004 && protoId != 3012 && protoId != 3001) //KeepAlive orderbook调用频繁 忽视
             console.debug(`request:${protoName}:${protoId}, requestId:${requestId}`);
         
         //封装包头
@@ -295,7 +295,7 @@ class Socket{
                 throw new Error('format error!!!');
             }
             
-            if(this.header.nProtoID!=1004) //KeepAlive调用频繁 忽视
+            if(this.header.nProtoID!=1004 && this.header.nProtoID!=3012 && this.header.nProtoID!=3001) //KeepAlive调用频繁 忽视
                 console.debug(`response:${ProtoName[this.header.nProtoID]}(${this.header.nProtoID}), 
                            reqId:${this.header.nSerialNo}, bodyLen:${bodyLen}`);
         }

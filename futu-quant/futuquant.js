@@ -464,6 +464,40 @@ class FutuQuant{
             ).klPointList || []
         );
     }
+
+ 
+    /**3012获取买卖盘，参数
+     * @async
+     * @param {Security} security 股票
+     * @param {number} num 请求的摆盘个数（1-10），默认9
+     * @returns {QotGetOrderBookResponse}
+     */
+
+    /**3012获取买卖盘协议返回对象
+     * @typedef QotGetOrderBookResponse
+     * @property {Security} security 股票
+     * @property {OrderBook[]} orderBookAskList 卖盘
+     * @property {OrderBook[]} sellList 卖盘，同orderBookAskList
+     * @property {OrderBook[]} orderBookBidList 买盘
+     * @property {OrderBook[]} buyList 买盘，同orderBookBidList
+     */
+    async qotGetOrderBook(security, num = 9) {
+        // 3012获取买卖盘
+        const result = await this.socket.send('Qot_GetOrderBook', {
+          security,
+          num,
+        });
+        const retObj = {};
+        retObj.buyList = result.orderBookAskList || [];
+        retObj.sellList = result.orderBookBidList || [];
+        retObj.sellList.forEach(item => {
+            item.volume = Number(item.volume);
+        });
+        retObj.buyList.forEach(item => {
+            item.volume = Number(item.volume);
+        });
+        return retObj;
+      }
 }
 
 module.exports = FutuQuant;

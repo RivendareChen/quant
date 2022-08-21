@@ -41,7 +41,7 @@ const download = async(ctx,next)=>{
 
     await next();
 
-    if(ctx.authState.state === true){
+    if(ctx.authState.state === true && checkStockCode(reqBody.code)!==false){
         retObj.state = true;
         retObj.msg='';
         //先订阅

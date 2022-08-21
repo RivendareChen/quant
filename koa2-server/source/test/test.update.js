@@ -8,6 +8,7 @@ const FtQuant = require('../../../futu-quant/futuquant');
 const ftConfig = require('../../../futu-quant/config').testFtConfig;
 let subCase = require('./case.test').subCase;
 let klCase = require('./case.test').klCase;
+const {getSubParamByType} = require('../../app/helpers/futuHelper');
 
 const testft = new FtQuant(ftConfig);
 
@@ -68,6 +69,20 @@ async function qotGetHistoryKLTest() {
         console.log(err);
     }
     
+}
+
+async function getHandicapTest(){
+    await testft.init();
+    subCase.securityList=[{market: 1,code:'00001'}];
+    subCase.subTypeList=getSubParamByType('handicap');
+    await testft.qotSub(subCase);
+    try{
+        const res = await testft.qotGetOrderBook({market: 1,code:'00001'},9);
+        console.log(res);
+    }catch(err){
+        console.log(err);
+    }
+    testft.close();
 }
 //klType 分k=1 时k=9 日k=2 周k=3 月k=4
 async function qotGetKLTest(klType=1,code='00001') {
@@ -168,6 +183,7 @@ async function getkData() {
 
 //mongod --dbpath /usr/local/var/mongodb --logpath /usr/local/var/log/mongodb/mongo.log --fork
 
-getkData();
-// subQotUpdateKLTest();
+
+getHandicapTest();
+// getkData();
 
