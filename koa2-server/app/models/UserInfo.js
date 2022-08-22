@@ -1,19 +1,27 @@
 const { default: mongoose } = require('mongoose');
 
 //用户表
-userSchema = new mongoose.Schema({
+const userSchema = new mongoose.Schema({
     username:{
         type:String,
-        required: true
+        required: true,
     },
     password:{
         type:String,
-        required: true
+        required: true,
+    },
+    usermail:{
+        type:String,
+        required:true,
+    },
+    level:{
+        type:Number,
+        required:true,
     }
 });
 
 //session表
-sessionSchema = new mongoose.Schema({
+const sessionSchema = new mongoose.Schema({
     username:{
         type:String,
         required: true

@@ -60,7 +60,7 @@ enum QotMarketState
 	QotMarketState_Morning = 3; // 早盘 
 	QotMarketState_Rest = 4; // 午间休市 
 	QotMarketState_Afternoon = 5; // 午盘 
-	QotMarketState_Closed = 6; // 收盘
+	QotMarketState_Closed = 6; // 收盘								
 	QotMarketState_PreMarketBegin = 8; // 盘前
 	QotMarketState_PreMarketEnd = 9; // 盘前结束 
 	QotMarketState_AfterHoursBegin = 10; // 盘后

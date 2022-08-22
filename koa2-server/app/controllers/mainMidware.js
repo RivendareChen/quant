@@ -3,7 +3,9 @@ const {getSubTemp} = require('../helpers/futuParam');
 const {getBasicByCode,
        getKlParamByType,
        getSubParamByType,
-       getKlByTypeAndCode} = require('../helpers/futuHelper');
+       getKlByTypeAndCode,
+       getHKMarketStateCode,
+      } = require('../helpers/futuHelper');
 const {checkStockCode} = require('../helpers/stockHelper');
 const {kDataformat} = require('../helpers/macdHelper');
 // const {nanoid} = require('nanoid'); 
@@ -51,7 +53,7 @@ const info = async(ctx, next)=>{
         subTemp.subTypeList = [1];
         subTemp.isSubOrUnSub = true;
         await ctx.quant.qotSub(subTemp);
-        // console.log(reqBody.code, subTemp.securityList);
+        const marketState = await getHKMarketStateCode(ctx.quant);
         const {price,trend} = await getBasicByCode(subTemp.securityList,ctx.quant);
         retObj = {
             code: reqBody.code,
@@ -59,67 +61,20 @@ const info = async(ctx, next)=>{
             en:stockExist.en,
             price: price.curPrice,
             trend: trend,
+            marketState:marketState,
             low:price.lowPrice,
             high:price.highPrice,
             vol:Number(price.volume),
         }
     }
 
-    
-
     await next();
-    console.log(reqBody.code,retObj.trend);
+    // console.log(reqBody.code,retObj.trend);
     ctx.response.type = "application/json";
     ctx.response.body = retObj;
 };
 
-//模拟摆盘数据
-getHandlecapData = (code, price)=>{
-    let buyArray = [];
-    let saleArray = [];
-    const myDate = new Date();
-    for(let i=0; i<9; i++){
-        //处理价格
-        let float = Math.random();
-        let buyPrice = (float+price).toFixed(2);
-        float = Math.random()-0.5;
-        let salePrice = (float+price).toFixed(2);
 
-        //处理时间
-        let hours = myDate.getHours();
-        if(hours<10) hours = '0'+hours;
-        let mins = myDate.getMinutes();
-        if(mins<10) mins = '0'+mins;
-        let secds = myDate.getSeconds();
-        if(secds<10) secds = '0'+secds;
-        let time = `${hours}:${mins}:${secds}`;
-
-        //处理数量
-        float = (Math.random()+0.01)*100;
-        let buyQuantity = float.toFixed(0);
-        float = (Math.random()+0.01)*100;
-        let saleQuantity = float.toFixed(0);
-
-        //封装对象至数组
-        buyArray.push({
-            time:time,
-            price:buyPrice,
-            quant:buyQuantity,
-            type:'buy',
-        });
-        saleArray.push({
-            time:time,
-            price:salePrice,
-            quant:saleQuantity,
-            type:'sale',
-        });
-    }
-    return {
-        code: code,
-        buyArray:buyArray,
-        saleArray:saleArray
-    }
-}
 //股票摆盘
 const handicap = async(ctx, next)=>{
     const reqBody = ctx.request.body;

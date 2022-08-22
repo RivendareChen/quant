@@ -70,10 +70,22 @@ async function getBasicByCode(securityList=getSubTemp().securityList, quant=null
     return retData;
 }
 
+//获取港股市场状态代码 返回类型:Number
+async function getHKMarketStateCode(quant=null){
+    if(!quant){
+        console.log('丢失futu连接实例!');
+        return;
+    }
+    const state = await quant.getGlobalState();
+    // console.log(state.marketHK);
+    return state.marketHK;
+}
+
 module.exports = {
     getKlByTypeAndCode:getKlByTypeAndCode,
     getBasicByCode:getBasicByCode,
     getKlParamByType:getKlParamByType,
     getSubParamByType:getSubParamByType,
+    getHKMarketStateCode:getHKMarketStateCode,
 
 };

@@ -1,5 +1,5 @@
 const {userModel, sessionModel} = require('../models/UserInfo.js');
-// const data = require('../../source/test/kdata.js');
+const {starModel} = require('../models/StarInfo.js');
 const {nanoid} = require('nanoid'); 
 
 //上下文权限验证
@@ -79,9 +79,8 @@ const login = async(ctx , next)=>{
 //注册
 const register = async(ctx, next)=>{
     const reqBody = ctx.request.body;
-    console.log('request register ', reqBody.username, reqBody.password);
-    const {username, password} = reqBody;
-
+    const {username, password, usermail} = reqBody;
+    console.log('request register ', username, password, usermail);
     await next();
 
     let retObj = {
@@ -97,12 +96,22 @@ const register = async(ctx, next)=>{
             retObj.state = false;
             retObj.msg = "该用户已存在";
         }else{
-            //进行注册
+            //注册用户信息
             const user = new userModel({
                 username: username,
                 password: password,
+                usermail: usermail,
+                level:0,
             });
             await user.save();
+            //新建用户收藏夹数据
+            const star = new starModel({
+                username:username,
+                total:['00001'],
+                folders:[{name:'默认收藏夹',children:[]}],
+            });
+            await star.save();
+            
             retObj.state = true;
             retObj.msg = "注册成功";
         }
