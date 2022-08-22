@@ -1,10 +1,11 @@
-const {sessionModel} = require('../models/UserInfo.js');
+const {sessionModel,userModel} = require('../models/UserInfo.js');
 
 //顶层中间件 挂载用户登录状态到ctx
 const prevAuthCheck = async(ctx, next)=>{
     let authState = {
         state: false,
         username: null,
+        level:-1,
     }
     try{
         const session = ctx.cookies.get('session');
@@ -13,9 +14,17 @@ const prevAuthCheck = async(ctx, next)=>{
             //未匹配到相应的用户
             authState.state = false;
         }else{
-            //匹配到了相应用户 封装用户名
-            authState.state = true;
-            authState.username = sessionArray[0]._doc.username;
+            const userArray = await userModel.find({username:sessionArray[0]._doc.username});
+            if(userArray.length<1){
+                authState.state = false;
+            }
+            else{
+                //匹配到了相应用户 封装用户名和用户级别
+                authState.state = true;
+                authState.username = sessionArray[0]._doc.username;
+                authState.level = userArray[0]._doc.level;
+            }
+             
         }
     }catch(err){
         console.log(err);

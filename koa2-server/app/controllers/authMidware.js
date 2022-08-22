@@ -7,6 +7,7 @@ const auth = async(ctx, next)=>{
     let retObj = {
         state: false,
         username: null,
+        level:-1,
     }
     
     await next();
@@ -111,7 +112,7 @@ const register = async(ctx, next)=>{
                 folders:[{name:'默认收藏夹',children:[]}],
             });
             await star.save();
-            
+
             retObj.state = true;
             retObj.msg = "注册成功";
         }
