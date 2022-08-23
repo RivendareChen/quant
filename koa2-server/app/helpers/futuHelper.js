@@ -61,9 +61,10 @@ async function getBasicByCode(securityList=getSubTemp().securityList, quant=null
     };
     //需要先订阅
     const res = await quant.qotGetBasicQot(securityList);
-    let percent = (res[0].curPrice-res[0].lastClosePrice)/res[0].lastClosePrice;
+    let percent = (res[0].curPrice-res[0].lastClosePrice)/res[0].lastClosePrice*100;
     //保留三位有效数字
-    percent = parseFloat(percent.toPrecision(3));
+    // percent = parseFloat(percent.toPrecision(3));
+    percent = percent.toFixed(3);
     retData.price = res[0];
     retData.trend = percent;
 

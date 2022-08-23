@@ -25,7 +25,7 @@ const initpolicy = async(ctx, next)=>{
         id:'s8cn05aKC4ISLhYGxIJ97',
         total:10000,
         time:{start:'2022-04-01 12:00:00',end:'2022-05-01 12:00:00'},
-        state: {code:1,msg:'策略已触发'},
+        state: {code:1,msg:'已触发'},
         
     });
 
@@ -33,14 +33,14 @@ const initpolicy = async(ctx, next)=>{
         id:'9d4OT0KpHxgapX7rdYmkn',
         total:20000,
         time:{start:'2022-03-01 12:00:00',end:'2022-04-01 12:00:00'},
-        state: {code:1,msg:'策略已触发'},
+        state: {code:1,msg:'已触发'},
     });
 
     retObj.myPolicy.push({
         id:'293KOshuaLKdhufh00aha57',
         total:5000,
         time:{start:'2022-02-01 12:00:00',end:'2022-05-02 12:00:00'},
-        state: {code:2,msg:'策略过期'},
+        state: {code:2,msg:'已过期'},
     });
 
     ctx.response.type = "application/json";
@@ -75,7 +75,7 @@ const setpolicy = async(ctx, next)=>{
         id:'',
         total:0,
         time:{start:'',end:''},
-        state: {code:0,msg:'正在执行'},
+        state: {code:0,msg:'执行中'},
         success: false,
         msg:'未知错误',
     }
