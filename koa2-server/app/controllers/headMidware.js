@@ -2,6 +2,7 @@ const data = require('../../source/test/kdata.js');
 const {getSubTemp} = require('../helpers/futuParam.js');
 const {getKlByTypeAndCode} = require('../helpers/futuHelper.js');
 const {checkStockCode} = require('../helpers/stockHelper');
+const stockData = require('../helpers/stockData');
 
 //股票搜索
 const search = async(ctx, next)=>{
@@ -26,6 +27,67 @@ const search = async(ctx, next)=>{
     ctx.response.type = "application/json";
     ctx.response.body = retObj;
 };
+
+//搜索联想
+const searchInfo = async(ctx, next)=>{
+    const reqBody = ctx.request.body;
+    const retObj = {
+        state: false,
+        type: 'null',
+        option:null,
+    };
+    if(reqBody.content === ''){
+        retObj.state = true;
+        retObj.type = 'suggest';
+        retObj.option = [
+            {code:'00001', "name":"长和", "en":"CKH HOLDINGS"},
+            {code:'00002', "name":"中电控股","en":"CLP HOLDINGS"},
+            {code:'00003', "name":"香港中华煤气","en":"HK & CHINA GAS"},
+            {code:'00004', "name":"九龙仓集团","en":"WHARF HOLDINGS"},
+            {code:'00005', "name":"汇丰控股","en":"HSBC HOLDINGS"},
+            {code:'00006', "name":"电能实业","en":"POWER ASSETS"},
+        ];
+    }
+    else{
+        const option = [];
+        for(let key in stockData){
+            if(option.length>=5)break;
+            const ifKey = key.split(reqBody.content).length>1;
+            const ifName = stockData[key].name.split(reqBody.content).length>1;
+            const ifEn = stockData[key].en.split(reqBody.content).length>1
+            if(ifKey || ifName || ifEn){
+                option.push({
+                    code:key,
+                    name:stockData[key].name,
+                    en:stockData[key].en
+                });
+            }
+        }
+
+        if(option.length>0){
+            retObj.state = true;
+            retObj.type = 'association';
+            retObj.option = option;
+        }
+        else{
+            retObj.state = true;
+            retObj.type = 'suggest';
+            retObj.option = [
+                {code:'00001', "name":"长和", "en":"CKH HOLDINGS"},
+                {code:'00002', "name":"中电控股","en":"CLP HOLDINGS"},
+                {code:'00003', "name":"香港中华煤气","en":"HK & CHINA GAS"},
+                {code:'00004', "name":"九龙仓集团","en":"WHARF HOLDINGS"},
+                {code:'00005', "name":"汇丰控股","en":"HSBC HOLDINGS"},
+                {code:'00006', "name":"电能实业","en":"POWER ASSETS"},
+            ];
+        }
+    }
+
+    await next();
+
+    ctx.response.type = "application/json";
+    ctx.response.body = retObj;
+}
 
 
 
@@ -68,7 +130,10 @@ const download = async(ctx,next)=>{
     ctx.response.body = retObj;
 };
 
+
+
 module.exports = {
     search:search,
     download:download,
+    searchInfo:searchInfo,
 };
