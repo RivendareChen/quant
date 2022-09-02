@@ -1,3 +1,5 @@
+const {ema12, ema26, ema9} = require('../../../cpp-module/build/Release/EmaHelper');
+
 //切割数组
 function splitData(rawData){
     const datas = []; 
@@ -51,7 +53,10 @@ function calcEMA(n,data){
     if(n === 12){
         const ema=[data[0][1]];  
         for(let i=1; i<data.length; ++i){
-            ema.push((0.153846*data[i][1]+0.84615*ema[i-1]).toFixed(3));
+            // console.log(typeof data[i][1], typeof ema[i-1]);
+            // ema.push(parseFloat(ema12(data[i][1],ema[i-1]).toFixed(3)));
+            ema.push(ema12(data[i][1],ema[i-1]));
+            // ema.push((0.153846*data[i][1]+0.84615*ema[i-1]).toFixed(3));
         }
         return ema;
     }
@@ -59,7 +64,9 @@ function calcEMA(n,data){
     if(n === 26){
         const ema=[data[0][1]];  
         for(let i=1; i<data.length; ++i){
-            ema.push((0.074074*data[i][1]+0.925926*ema[i-1]).toFixed(3));
+            // ema.push(parseFloat(ema26(data[i][1],ema[i-1]).toFixed(3)));
+            ema.push(ema26(data[i][1],ema[i-1]));
+            // ema.push((0.074074*data[i][1]+0.925926*ema[i-1]).toFixed(3));
         }
         return ema;
     }
@@ -67,28 +74,13 @@ function calcEMA(n,data){
     if(n === 9){
         const ema=[data[0]];
         for(let i=1; i<data.length; ++i){
-            ema.push((0.2*data[i]+0.8*ema[i-1]).toFixed(3));
+            // ema.push(parseFloat(ema9(data[i],ema[i-1]).toFixed(3)));
+            ema.push(ema9(data[i],ema[i-1]));
+            // ema.push((0.2*data[i]+0.8*ema[i-1]).toFixed(3));
         }
         return ema;
     }
-
-    // const a=2/(n+1);
-    
-    // if(field){
-    //     //适配dif 计算ema26 ema12
-    //     const ema=[data[0][field]];  
-    //     for(let i=1; i<data.length; ++i){
-    //         ema.push((a*data[i][field]+(1-a)*ema[i-1]).toFixed(3));
-    //     }
-    //     return ema;
-    // }
-
-    // //适配dea 计算ema9
-    // const ema=[data[0]];
-    // for(let i=1; i<data.length; ++i){
-    //     ema.push((a*data[i]+(1-a)*ema[i-1]).toFixed(3));
-    // }
-    // return ema;
+    return [];
 };
 
 //计算DIF
@@ -97,7 +89,7 @@ function calcDIF(data){
     const emaShort=calcEMA(12,data);
     const emaLong=calcEMA(26,data);
     for(let i=0; i<data.length; ++i){
-        dif.push((emaShort[i]-emaLong[i]).toFixed(3));
+        dif.push(emaShort[i]-emaLong[i]);
     }
     return dif;
 };
