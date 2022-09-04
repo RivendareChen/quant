@@ -1,4 +1,6 @@
-const {ema12, ema26, ema9} = require('../../../cpp-module/build/Release/EmaHelper');
+//Node.js的C++模块不支持跨平台，这里默认使用js计算ema
+//非m1芯片mac的用户，请参照https://segmentfault.com/a/1190000023544791自行在cpp-module文件夹中配置。
+// const {ema12, ema26, ema9} = require('../../../cpp-module/build/Release/EmaHelper');
 
 //切割数组
 function splitData(rawData){
@@ -53,10 +55,8 @@ function calcEMA(n,data){
     if(n === 12){
         const ema=[data[0][1]];  
         for(let i=1; i<data.length; ++i){
-            // console.log(typeof data[i][1], typeof ema[i-1]);
-            // ema.push(parseFloat(ema12(data[i][1],ema[i-1]).toFixed(3)));
-            ema.push(ema12(data[i][1],ema[i-1]));
-            // ema.push((0.153846*data[i][1]+0.84615*ema[i-1]).toFixed(3));
+            // ema.push(ema12(data[i][1],ema[i-1]));
+            ema.push((0.153846*data[i][1]+0.84615*ema[i-1]).toFixed(3));
         }
         return ema;
     }
@@ -64,9 +64,8 @@ function calcEMA(n,data){
     if(n === 26){
         const ema=[data[0][1]];  
         for(let i=1; i<data.length; ++i){
-            // ema.push(parseFloat(ema26(data[i][1],ema[i-1]).toFixed(3)));
-            ema.push(ema26(data[i][1],ema[i-1]));
-            // ema.push((0.074074*data[i][1]+0.925926*ema[i-1]).toFixed(3));
+            // ema.push(ema26(data[i][1],ema[i-1]));
+            ema.push((0.074074*data[i][1]+0.925926*ema[i-1]).toFixed(3));
         }
         return ema;
     }
@@ -74,9 +73,8 @@ function calcEMA(n,data){
     if(n === 9){
         const ema=[data[0]];
         for(let i=1; i<data.length; ++i){
-            // ema.push(parseFloat(ema9(data[i],ema[i-1]).toFixed(3)));
-            ema.push(ema9(data[i],ema[i-1]));
-            // ema.push((0.2*data[i]+0.8*ema[i-1]).toFixed(3));
+            // ema.push(ema9(data[i],ema[i-1]));
+            ema.push((0.2*data[i]+0.8*ema[i-1]).toFixed(3));
         }
         return ema;
     }

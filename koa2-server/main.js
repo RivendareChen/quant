@@ -113,7 +113,7 @@ async function testinit(port=7777, dbName='test'){
 
 
 //启动工程模式。如需启动测试模式，请注释下方第一条代码。
-// init(3000,'test','./source/static/build');
+init(3000,'test','./source/static/build');
 
 //启动测试模式。如需启动工程模式，请注释下方第一条代码。
-testinit(7777, 'test');
+// testinit(7777, 'test');

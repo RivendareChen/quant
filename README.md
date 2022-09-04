@@ -1,13 +1,13 @@
 ## 1. 安装说明
 ### 1.1 安装FutuOpenD
 
-* 在[官方页面](https://www.futunn.com/download/OpenAPI)下载该软件，推荐5.11.2308版本。
-* 按照[官方文档](https://openapi.futunn.com/futu-api-doc/opend/opend-cmd.html)进行配置。在编辑配置文件`FutuOpenD.xml`时，建议使用本仓库中的` /doc/FutuOpenD.xml`进行覆盖，并将`<login_account>`和`<login_pwd_md5>`字段对应的值替换成自己的用户名和md5加密后的密码。
+* 在[官方页面](https://www.futunn.com/download/OpenAPI){target="_blank"}下载该软件，推荐5.11.2308版本。
+* 按照[官方文档](https://openapi.futunn.com/futu-api-doc/opend/opend-cmd.html){target="_blank"}进行配置。在编辑配置文件`FutuOpenD.xml`时，建议使用本仓库中的` /doc/FutuOpenD.xml`进行覆盖，并将`<login_account>`和`<login_pwd_md5>`字段对应的值替换成自己的用户名和md5加密后的密码。
 * 以**命令行的形式**启动FutuOpenD。
 
 ### 1.2 安装MongoDB
 
-* 在[官方页面](https://www.mongodb.com/try/download/enterprise)下载该软件，推荐5.0.7以上版本。
+* 在[官方页面](https://www.mongodb.com/try/download/enterprise){target="_blank"}下载该软件，推荐5.0.7以上版本。
 
 * 启动MongoDB，**请不要修改任何默认配置参数**。
 
@@ -15,7 +15,7 @@
 
 ### 1.3 配置部署环境
 
-* 在[官方页面](https://nodejs.org/zh-cn/download/)下载Node.js，推荐v16.16.0以上版本，并安装。
+* 在[官方页面](https://nodejs.org/zh-cn/download/){target="_blank"}下载Node.js，推荐v16.16.0以上版本，并安装。
 
 * 使用VSCode打开本仓库所示源码，并在Terminal中运行`npm install`。等待所有依赖包完成安装。
 
@@ -31,7 +31,7 @@
 
   <img src='./doc/images/img-server.png' width=60%/>
 
-* 测试模式是为了搭配前端开发环境，需启动[前端工程](https://github.com/RivendareChen/quant-frontend)。
+* 测试模式是为了搭配前端开发环境，需启动[前端工程](https://github.com/RivendareChen/quant-frontend){target="_blank"}。
   <img src='./doc/images/img-test.png' width=60%/>
 
 ## 2. 错误排查
