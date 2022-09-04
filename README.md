@@ -31,7 +31,7 @@
 
   <img src='./doc/images/img-server.png' width=60%/>
 
-* 测试模式是为了搭配前端开发环境，需先启动[前端工程](https://github.com/RivendareChen/quant-frontend)。
+* 测试模式是为了搭配前端开发环境，需启动[前端工程](https://github.com/RivendareChen/quant-frontend)。
   <img src='./doc/images/img-test.png' width=60%/>
 
 ## 2. 错误排查
