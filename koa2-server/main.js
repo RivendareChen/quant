@@ -111,5 +111,9 @@ async function testinit(port=7777, dbName='test'){
     console.log(`已启动测试服务器\n请配合create-react-app使用\n(配置其代理至localhost:${port})`);
 }
 
+
+//启动工程模式。如需启动测试模式，请注释下方第一条代码。
 init(3000,'test','./source/static/build');
+
+//启动测试模式。如需启动工程模式，请注释下方第一条代码。
 // testinit(7777, 'test');
