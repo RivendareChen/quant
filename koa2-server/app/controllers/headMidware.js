@@ -4,6 +4,7 @@ const {getKlByTypeAndCode} = require('../helpers/futuHelper.js');
 const {checkStockCode} = require('../helpers/stockHelper');
 const stockData = require('../helpers/stockData');
 
+
 //股票搜索
 const search = async(ctx, next)=>{
     console.log('search '+ctx.request.body.code);

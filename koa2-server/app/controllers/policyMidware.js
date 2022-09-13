@@ -1,5 +1,6 @@
 // const data = require('../../source/test/kdata.js');
 const {nanoid} = require('nanoid'); 
+const {checkStockCode} = require('../helpers/stockHelper');
 
 //策略初始化
 const initpolicy = async(ctx, next)=>{
@@ -58,7 +59,7 @@ const checkPolicyItem = async(ctx, next)=>{
         msg:'该股票代码不存在',
     }
 
-    if(code==='00001' || code==='00002' || code==='00003'){
+    if(checkStockCode(code)){
         retObj.state = true;
         retObj.msg='';
     }
